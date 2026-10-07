@@ -1,0 +1,23 @@
+@media screen and (max-width: 480px) {}
+
+body {
+    margin: 0;
+}
+header {
+    display: flex;
+    text-align: center;
+    box-shadow: 0 5px 35px black;
+    margin: 0;
+    padding: 0;
+}
+
+#logo {
+    width: 150px;
+}
+
+#page-header-title {
+    align-content: center;
+    text-align: right;
+    font-weight: bold;
+    width: 50%;
+}
