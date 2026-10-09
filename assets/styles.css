@@ -23,11 +23,21 @@
         font-weight: bold;
     }
 
+    #sales-quick-action {
+        text-align: center;
+        padding: 20px;
+    }
+
+    #sales-quick-action a {
+        display: block;
+    }
 /* } */
 
 body {
     margin: 0;
 }
+
+
 
 @media screen and (min-width: 481px) {
     header {
