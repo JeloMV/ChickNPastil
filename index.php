@@ -1,10 +1,12 @@
 <?php
 session_start();
 
-if (($_SESSION['role'] ?? null) === 'staff') {
+$_SESSION['role'] = 'staff';
+
+if ($_SESSION['role'] === 'staff') {
     header('Location: /ChickNPastil/staff/dashboard.html');
     exit;
-} elseif (($_SESSION['role'] ?? null) === 'manager') {
+} else if ($_SESSION['role'] === 'manager') {
     header('Location: /ChickNPastil/manager/dashboard.html');
     exit;
 } else {
