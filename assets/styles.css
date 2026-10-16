@@ -9,7 +9,15 @@
     }
 
     #live-sales {
+        display: block;
         text-align: center;
+        margin: 0 auto;
+        width: calc(100% - 16px);
+        max-width: 100%;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 0 10px 0 black;
+        box-sizing: border-box;
     }
 
     #logo {
@@ -35,6 +43,7 @@
 
 body {
     margin: 0;
+    background-color: white;
 }
 
 
