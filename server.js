@@ -4,6 +4,7 @@ const path = require("path")
 const app = express()
 const PORT = 3000;
 
+app.use(express.static(path.resolve(__dirname)));
 
 app.get("/", (req, res) => {
     const role = "staff";
@@ -12,7 +13,7 @@ app.get("/", (req, res) => {
         return res.redirect("/staff/dashboard.html");
     }
 
-    if (role === "manger") {
+    if (role === "manager") {
         return res.redirect("/manager/dashboard.html");
     }
     return res.redirect("/login");
