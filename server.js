@@ -6,6 +6,10 @@ const PORT = 3000;
 
 app.use(express.static(path.resolve(__dirname)));
 
+app.get("/api/menu", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "data", "menu.json"));
+});
+
 app.get("/", (req, res) => {
     const role = "staff";
 

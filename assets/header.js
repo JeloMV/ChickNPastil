@@ -1,7 +1,7 @@
 const headerTitles = {
     'staff/dashboard.html': 'Live Sales Operations',
-    'staff/ordering.php': 'Create Order',
-    'staff/transaction_logs.php': 'Transaction Logs'
+    'staff/ordering.html': 'Create Order',
+    'staff/transaction_logs.html': 'Transaction Logs'
 };
 
 const headerScript = document.currentScript;
