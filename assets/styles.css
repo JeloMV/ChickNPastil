@@ -1,11 +1,16 @@
 /* @media screen and (max-width: 480px) { */
     header {
         display: flex;
-        position: relative;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
         text-align: center;
         box-shadow: 0 5px 35px black;
         margin-bottom: 10px;
         padding: 0;
+        background-color: white;
+        z-index: 1000;
     }
 
     #live-sales {
@@ -43,6 +48,7 @@
 
 body {
     margin: 0;
+    padding-top: 100px;
     background-color: white;
 }
 

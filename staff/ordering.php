@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ordering</title>
+    <link rel="stylesheet" href="../assets/styles.css">
     <style>
         .ordering-item img {
             width: 120px;
@@ -15,10 +16,12 @@
 </head>
 
 <body>
+    <div id="header-placeholder"></div>
     <div class="menu">
         <div class="ordering-item"></div>
     </div>
 
+    <script src="../assets/header.js"></script>
     <script>
         function renderMenu(sections) {
             const page = document.querySelector('.menu');
