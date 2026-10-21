@@ -10,45 +10,31 @@
 <body>
 
     <h3>Ordering Menu Display</h3>
-    <div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Image</th>
-                    <th>Product ID</th>
-                    <th>Product Name</th>
-                    <th>Price</th>
-                    <th>Quantity Selector</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% menuList.forEach(function(menu) { %>
-                    <tr>
-                        <td><input type="image">Add Image</td>
-                        <td>
-                            <%= menu_products.product_id %>
-                        </td>
-                        <td>
-                            <%= menu_products.product_name %>
-                        </td>
-                        <td>
-                            <%= menu_products.price%>
-                        </td>
-                        <td>
-                            <button type="button"
-                                class="toggle-btn <%= product.allow_quantity ? 'enabled' : 'disabled' %>"
-                                data-id="<%= product.id %>" data-field="allow_quantity"
-                                aria-pressed="<%= product.allow_quantity %>">
-                                <%= product.allow_quantity ? 'Enabled' : 'Disabled' %>
-                            </button>
-                        </td>
-                        <td><button type="button" class="edit-btn"></button></td>
-                    </tr>
-                    <% }); %>
-            </tbody>
-        </table>
-    </div>
+<!-- Form 1: Add a Section -->
+<div class="card">
+    <h4>Create New Section (Category)</h4>
+    <form id="addSectionForm">
+        <input type="text" id="sectionName" placeholder="Section name (e.g. Rice Meals)" required>
+        <button type="submit">Add Section</button>
+    </form>
+</div>
+
+<!-- Form 2: Add an Item to a Section -->
+<div class="card">
+    <h4>Add Product under a Section</h4>
+    <form id="addProductForm">
+        <!-- Dropdown populated dynamically with sections -->
+        <select id="sectionSelect" required>
+            <option value="">Select Section...</option>
+        </select>
+        <input type="text" id="productName" placeholder="Product name" required>
+        <input type="number" id="productPrice" placeholder="Price" step="0.01" required>
+        <button type="submit">Add Product</button>
+    </form>
+</div>
+
+<!-- Table showing Sections & Products -->
+<div id="menuTableContainer"></div>
     <script src="menu.js"></script>
 </body>
 

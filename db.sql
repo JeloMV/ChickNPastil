@@ -14,10 +14,17 @@ CREATE TABLE menu_products (
     description VARCHAR(255),
     price DECIMAL(10,2) NOT NULL,
     is_available BOOLEAN NOT NULL DEFAULT TRUE,
+    image_url VARCHAR(255) NULL,
+    allow_quantity BOOLEAN NOT NULL DEFAULT TRUE,
     added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     Foreign key (section_id) references menu_section(section_id )
 );
+
+-- Safe for databases created before these menu settings were added.
+ALTER TABLE menu_products
+    ADD COLUMN IF NOT EXISTS image_url VARCHAR(255) NULL,
+    ADD COLUMN IF NOT EXISTS allow_quantity BOOLEAN NOT NULL DEFAULT TRUE;
 
 CREATE TABLE product_addons (
     addon_id INT AUTO_INCREMENT PRIMARY KEY,
