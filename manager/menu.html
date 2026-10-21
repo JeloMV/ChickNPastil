@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <h3>Ordering Menu Display</h3>
+    <div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Product ID</th>
+                    <th>Product Name</th>
+                    <th>Price</th>
+                    <th>Quantity Selector</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% menuList.forEach(function(menu) { %>
+                    <tr>
+                        <td><input type="image">Add Image</td>
+                        <td>
+                            <%= menu_products.product_id %>
+                        </td>
+                        <td>
+                            <%= menu_products.product_name %>
+                        </td>
+                        <td>
+                            <%= menu_products.price%>
+                        </td>
+                        <td>
+                            <button type="button"
+                                class="toggle-btn <%= product.allow_quantity ? 'enabled' : 'disabled' %>"
+                                data-id="<%= product.id %>" data-field="allow_quantity"
+                                aria-pressed="<%= product.allow_quantity %>">
+                                <%= product.allow_quantity ? 'Enabled' : 'Disabled' %>
+                            </button>
+                        </td>
+                        <td><button type="button" class="edit-btn"></button></td>
+                    </tr>
+                    <% }); %>
+            </tbody>
+        </table>
+    </div>
+    <script src="menu.js"></script>
+</body>
+
+</html>

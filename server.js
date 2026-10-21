@@ -1,5 +1,8 @@
+require('dotenv').config();
+
 const express = require('express')
 const path = require("path")
+const db = require('./includes/db');
 
 const app = express()
 const PORT = 3000;
@@ -11,7 +14,7 @@ app.get("/api/menu", (req, res) => {
 });
 
 app.get("/", (req, res) => {
-    const role = "staff";
+    const role = "manager";
 
     if(role === "staff"){
         return res.redirect("/staff/dashboard.html");
