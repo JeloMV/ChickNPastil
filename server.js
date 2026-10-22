@@ -24,6 +24,10 @@ app.get("/", (req, res) => {
 
 });
 
+app.get("/staff/ordering.html", (req, res) => {
+    res.redirect("/pos/ordering.html");
+});
+
 app.listen(PORT, () => {
     console.log(`http://localhost:${PORT}`);
 });

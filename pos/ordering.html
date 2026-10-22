@@ -53,9 +53,12 @@
 
                 const row = document.createElement('div');
                 row.className = 'summary-item';
+                const options = item.options
+                    ? `<small>${item.options.flavor} flavor, ${item.options.rice} rice</small>`
+                    : '';
                 row.innerHTML = `
                     <button type="button" class="remove-item" aria-label="Remove ${item.name}">×</button>
-                    <strong>${item.name}</strong>
+                    <strong>${item.name}${options}</strong>
                     <input type="number" min="1" value="${item.quantity}" class="summary-quantity">
                 `;
 
@@ -92,16 +95,23 @@
             }
         }
 
-        function addItem(item, quantity = 1) {
+        function addItem(item, quantity = 1, options = null) {
             const id = item.product_id || item.id;
-            const existing = selectedItems.get(id);
-            selectedItems.set(id, {
-                id,
+            const variantId = options
+                ? `${id}-${options.flavor}-${options.rice}`
+                : String(id);
+            const existing = selectedItems.get(variantId);
+            selectedItems.set(variantId, {
+                id: variantId,
+                productId: id,
                 name: item.name,
                 price: Number(item.price) || 0,
-                quantity: existing ? existing.quantity + quantity : quantity
+                quantity: existing ? existing.quantity + quantity : quantity,
+                options
             });
-            updateMenuQuantity(id, selectedItems.get(id).quantity);
+            if (!options) {
+                updateMenuQuantity(id, selectedItems.get(variantId).quantity);
+            }
             renderOrderSummary();
         }
 
@@ -122,13 +132,37 @@
                 items.className = 'menu-section-items';
                 sectionBlock.appendChild(items);
 
+                const isPastilSection = section.name.toLowerCase() === 'pastil size';
+
                 (section.items || []).forEach(item => {
                     const card = document.createElement('div');
                     card.className = 'ordering-item';
                     card.dataset.productId = item.product_id || item.id;
 
                     // Check if quantity selector is enabled or disabled from the manager settings
-                    const actionButton = item.allow_quantity
+                    const actionButton = isPastilSection
+                        ? `
+                        <button type="button" class="configure-pastil">Select size</button>
+                        <div class="pastil-options" hidden>
+                            <label>
+                                Flavor
+                                <select class="pastil-flavor">
+                                    <option value="Original">Original</option>
+                                    <option value="Spicy">Spicy</option>
+                                </select>
+                            </label>
+                            <label>
+                                Rice
+                                <select class="pastil-rice">
+                                    <option value="Original">Original</option>
+                                    <option value="Garlic">Garlic</option>
+                                </select>
+                            </label>
+                            <button type="button" class="add-pastil">Add to order</button>
+                            <button type="button" class="cancel-pastil">Cancel</button>
+                        </div>
+                        `
+                        : item.allow_quantity
                         ? `
                         <div class="qty-selector">
                             <input type="number" value="0" min="0" class="qty-input">
@@ -152,14 +186,39 @@
                     `;
 
                     card.addEventListener('click', event => {
-                        if (event.target.closest('.qty-selector')) {
+                        if (event.target.closest('.qty-selector, .pastil-options, .configure-pastil')) {
                             return;
                         }
 
-                        addItem(item);
+                        if (!isPastilSection) {
+                            addItem(item);
+                        }
                     });
 
-                    if (item.allow_quantity) {
+                    if (isPastilSection) {
+                        const configureButton = card.querySelector('.configure-pastil');
+                        const optionsPanel = card.querySelector('.pastil-options');
+                        const addButton = card.querySelector('.add-pastil');
+
+                        configureButton.addEventListener('click', () => {
+                            optionsPanel.hidden = false;
+                            configureButton.hidden = true;
+                        });
+
+                        addButton.addEventListener('click', () => {
+                            addItem(item, 1, {
+                                flavor: card.querySelector('.pastil-flavor').value,
+                                rice: card.querySelector('.pastil-rice').value
+                            });
+                            optionsPanel.hidden = true;
+                            configureButton.hidden = false;
+                        });
+
+                        card.querySelector('.cancel-pastil').addEventListener('click', () => {
+                            optionsPanel.hidden = true;
+                            configureButton.hidden = false;
+                        });
+                    } else if (item.allow_quantity) {
                         card.querySelector('.qty-input').addEventListener('change', event => {
                             const quantity = Math.max(0, Number(event.target.value) || 0);
                             if (quantity === 0) {

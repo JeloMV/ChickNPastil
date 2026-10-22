@@ -1,6 +1,6 @@
 const headerTitles = {
     'staff/dashboard.html': 'Live Sales Operations',
-    'staff/ordering.html': 'Create Order',
+    'pos/ordering.html': 'Create Order',
     'staff/transaction_logs.html': 'Transaction Logs'
 };
 
