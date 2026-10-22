@@ -4,264 +4,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ordering</title>
+    <title>Order Selection - Chick N Pastil</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="../assets/styles.css">
 </head>
 
-<body>
-    <div id="header-placeholder"></div>
-    <div class="menu">
-        <div class="ordering-item"></div>
-    </div>
+<body data-page-header="Order Selection">
+    <div id="topbar-wrapper"></div>
+    <div id="sidebar-wrapper"></div>
 
-    <section class="order-summary">
-        <h3>Order Summary</h3>
-        <div class="summary-header">
-            <strong>Item</strong>
-            <strong>Qty</strong>
+    <main class="page-container">
+        <div class="ordering-container">
+            <div class="menu">
+                <div class="ordering-item"></div>
+            </div>
+
+            <section class="order-summary">
+                <h3>Order Summary</h3>
+                <div class="summary-header">
+                    <strong>Item</strong>
+                    <strong>Qty</strong>
+                </div>
+                <div id="summary-items">
+                    <p class="empty-summary">No items selected.</p>
+                </div>
+                <div class="summary-total">
+                    <strong>Total Amount:</strong>
+                    <strong id="summary-total-amount">Php 0.00</strong>
+                </div>
+                <button type="button" id="complete-order" class="complete-order" disabled>
+                    Complete Order
+                </button>
+                <div class="attached-logs">
+                    <strong>Attached:</strong>
+                    <a href="../staff/transaction_logs.html">Today Sales Logs</a>
+                </div>
+            </section>
         </div>
-        <div id="summary-items">
-            <p class="empty-summary">No items selected.</p>
-        </div>
-        <div class="summary-total">
-            <strong>Total Amount:</strong>
-            <strong id="summary-total-amount">Php 0.00</strong>
-        </div>
-        <button type="button" id="complete-order" class="complete-order" disabled>
-            Complete Order
-        </button>
-        <div class="attached-logs">
-            <strong>Attached:</strong>
-            <a href="transaction_logs.html">Today's Sales Logs</a>
-        </div>
-    </section>
+    </main>
 
-    <script src="../assets/header.js"></script>
-    <script>
-        const selectedItems = new Map();
-
-        function renderOrderSummary() {
-            const summaryItems = document.getElementById('summary-items');
-            const totalElement = document.getElementById('summary-total-amount');
-            const completeButton = document.getElementById('complete-order');
-            summaryItems.replaceChildren();
-
-            let total = 0;
-            selectedItems.forEach(item => {
-                const subtotal = item.price * item.quantity;
-                total += subtotal;
-
-                const row = document.createElement('div');
-                row.className = 'summary-item';
-                const options = item.options
-                    ? `<small>${item.options.flavor} flavor, ${item.options.rice} rice</small>`
-                    : '';
-                row.innerHTML = `
-                    <button type="button" class="remove-item" aria-label="Remove ${item.name}">×</button>
-                    <strong>${item.name}${options}</strong>
-                    <input type="number" min="1" value="${item.quantity}" class="summary-quantity">
-                `;
-
-                row.querySelector('.remove-item').addEventListener('click', () => {
-                    selectedItems.delete(item.id);
-                    updateMenuQuantity(item.id, 0);
-                    renderOrderSummary();
-                });
-
-                row.querySelector('.summary-quantity').addEventListener('change', event => {
-                    item.quantity = Math.max(1, Number(event.target.value) || 1);
-                    updateMenuQuantity(item.id, item.quantity);
-                    renderOrderSummary();
-                });
-
-                summaryItems.appendChild(row);
-            });
-
-            if (selectedItems.size === 0) {
-                summaryItems.innerHTML = '<p class="empty-summary">No items selected.</p>';
-            }
-
-            totalElement.textContent = `Php ${total.toFixed(2)}`;
-            completeButton.disabled = selectedItems.size === 0;
-        }
-
-        function updateMenuQuantity(productId, quantity) {
-            const card = document.querySelector(`[data-product-id="${productId}"]`);
-            if (card) {
-                const quantityInput = card.querySelector('.qty-input');
-                if (quantityInput) {
-                    quantityInput.value = quantity;
-                }
-            }
-        }
-
-        function addItem(item, quantity = 1, options = null) {
-            const id = item.product_id || item.id;
-            const variantId = options
-                ? `${id}-${options.flavor}-${options.rice}`
-                : String(id);
-            const existing = selectedItems.get(variantId);
-            selectedItems.set(variantId, {
-                id: variantId,
-                productId: id,
-                name: item.name,
-                price: Number(item.price) || 0,
-                quantity: existing ? existing.quantity + quantity : quantity,
-                options
-            });
-            if (!options) {
-                updateMenuQuantity(id, selectedItems.get(variantId).quantity);
-            }
-            renderOrderSummary();
-        }
-
-        function renderMenu(sections) {
-            const page = document.querySelector('.menu');
-            page.replaceChildren();
-
-            sections.forEach(section => {
-                const sectionBlock = document.createElement('section');
-                sectionBlock.className = 'menu-section';
-
-                const title = document.createElement('h3');
-                title.className = 'menu-section-title';
-                title.textContent = section.name;
-                sectionBlock.appendChild(title);
-
-                const items = document.createElement('div');
-                items.className = 'menu-section-items';
-                sectionBlock.appendChild(items);
-
-                const isPastilSection = section.name.toLowerCase() === 'pastil size';
-
-                (section.items || []).forEach(item => {
-                    const card = document.createElement('div');
-                    card.className = 'ordering-item';
-                    card.dataset.productId = item.product_id || item.id;
-
-                    // Check if quantity selector is enabled or disabled from the manager settings
-                    const actionButton = isPastilSection
-                        ? `
-                        <button type="button" class="configure-pastil">Select size</button>
-                        <div class="pastil-options" hidden>
-                            <label>
-                                Flavor
-                                <select class="pastil-flavor">
-                                    <option value="Original">Original</option>
-                                    <option value="Spicy">Spicy</option>
-                                </select>
-                            </label>
-                            <label>
-                                Rice
-                                <select class="pastil-rice">
-                                    <option value="Original">Original</option>
-                                    <option value="Garlic">Garlic</option>
-                                </select>
-                            </label>
-                            <button type="button" class="add-pastil">Add to order</button>
-                            <button type="button" class="cancel-pastil">Cancel</button>
-                        </div>
-                        `
-                        : item.allow_quantity
-                        ? `
-                        <div class="qty-selector">
-                            <input type="number" value="0" min="0" class="qty-input">
-                        </div>
-                        `
-                        : `
-                        <button type="button" class="btn-add">+</button>
-                    `;
-
-                    // Only display price if greater than 0
-                    const priceDisplay = item.price > 0 ? `<p>Php ${item.price}</p>` : '';
-                    const imageTag = item.image_url
-                        ? `<img src="../${item.image_url}" alt="${item.name}">`
-                        : '';
-
-                    card.innerHTML = `
-                        ${imageTag}
-                        <h3>${item.name}</h3>
-                        ${priceDisplay}
-                        ${actionButton}
-                    `;
-
-                    card.addEventListener('click', event => {
-                        if (event.target.closest('.qty-selector, .pastil-options, .configure-pastil')) {
-                            return;
-                        }
-
-                        if (!isPastilSection) {
-                            addItem(item);
-                        }
-                    });
-
-                    if (isPastilSection) {
-                        const configureButton = card.querySelector('.configure-pastil');
-                        const optionsPanel = card.querySelector('.pastil-options');
-                        const addButton = card.querySelector('.add-pastil');
-
-                        configureButton.addEventListener('click', () => {
-                            optionsPanel.hidden = false;
-                            configureButton.hidden = true;
-                        });
-
-                        addButton.addEventListener('click', () => {
-                            addItem(item, 1, {
-                                flavor: card.querySelector('.pastil-flavor').value,
-                                rice: card.querySelector('.pastil-rice').value
-                            });
-                            optionsPanel.hidden = true;
-                            configureButton.hidden = false;
-                        });
-
-                        card.querySelector('.cancel-pastil').addEventListener('click', () => {
-                            optionsPanel.hidden = true;
-                            configureButton.hidden = false;
-                        });
-                    } else if (item.allow_quantity) {
-                        card.querySelector('.qty-input').addEventListener('change', event => {
-                            const quantity = Math.max(0, Number(event.target.value) || 0);
-                            if (quantity === 0) {
-                                selectedItems.delete(item.product_id || item.id);
-                            } else {
-                                selectedItems.set(item.product_id || item.id, {
-                                    id: item.product_id || item.id,
-                                    name: item.name,
-                                    price: Number(item.price) || 0,
-                                    quantity
-                                });
-                            }
-                            renderOrderSummary();
-                        });
-                    }
-
-                    items.appendChild(card);
-                });
-
-                page.appendChild(sectionBlock);
-            });
-        }
-
-        fetch('/api/menu')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Menu request failed: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(menu => renderMenu(menu.sections || menu))
-            .catch(error => {
-                document.querySelector('.menu').textContent =
-                    `Unable to load menu. ${error.message}`;
-                console.error(error);
-            });
-
-        document.getElementById('complete-order').addEventListener('click', () => {
-            alert('Order summary is ready for checkout.');
-        });
-
-        renderOrderSummary();
-    </script>
+    <script src="../assets/shared/bars.js"></script>
+    <script src="order.js"></script>
 </body>
 
 </html>

@@ -3,42 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chick N Pastil</title>
+    <title>Live Sales Operations - Chick N Pastil</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="../assets/styles.css">
 </head>
-<body>
-    <div id="header-placeholder"></div>
-    
-    <div id="live-sales">
-        <div>Branch: <span id="branchname">Balagtas</span></div>
-        <div class="sales-stats">
-            <span>Total Orders</span>
-            <div id="total-orders">Php 0.00</div>
+<body data-page-header="Live Sales Operations">
+    <div id="topbar-wrapper"></div>
+    <div id="sidebar-wrapper"></div>
+
+    <main class="page-container">
+        <div id="live-sales" class="sales-dashboard-card">
+            <h5 class="branch-heading text-center mb-4">Branch: <span id="branchname" class="fw-bold">Balagtas</span></h5>
+            
+            <div class="stats-grid">
+                <div class="sales-stat-card">
+                    <span class="stat-label">Total Orders</span>
+                    <div id="total-orders" class="stat-value">250</div>
+                </div>
+
+                <div class="sales-stat-card">
+                    <span class="stat-label">Total Cash Transactions</span>
+                    <div id="total-cash" class="stat-value">Php 4000.00</div>
+                </div>
+
+                <div class="sales-stat-card">
+                    <span class="stat-label">Total Sales Revenue</span>
+                    <div id="total-sales" class="stat-value">Php 8000.00</div>
+                </div>
+
+                <div class="sales-stat-card">
+                    <span class="stat-label">Total GCash Transactions</span>
+                    <div id="total-gcash" class="stat-value">Php 4000.00</div>
+                </div>
+            </div>
+
+            <div class="navigate-section mt-4 text-center">
+                <h5 class="fw-bold mb-3">Navigate</h5>
+                <div class="d-flex flex-column gap-2 align-items-center">
+                    <a href="../pos/ordering.html" class="nav-action-pill">Create Order</a>
+                    <a href="transaction_logs.html" class="nav-action-pill">Today Transactions</a>
+                </div>
+            </div>
         </div>
+    </main>
 
-        <div class="sales-stats">
-            <span>Total Sales Revenue</span>
-            <div id="total-sales">Php 0.00</div>
-        </div>
-
-        <div class="sales-stats">
-            <span>Total Cash Transactions</span>
-            <div id="total-cash">Php 0.00</div>
-        </div>
-
-        <div class="sales-stats">
-            <span>Total GCash Transactions</span>
-            <div id="total-gcash">Php 0.00</div>
-        </div>
-        
-
-    </div>
-
-    <div id="sales-quick-action">
-        <span>Navigate</span>
-        <a href="../pos/ordering.html">Create Order</a>
-        <a href="transaction_logs.html">Recent Transactions</a>
-    </div>
-    <script src="../assets/header.js"></script>
+    <script src="../assets/shared/bars.js"></script>
 </body>
 </html>
