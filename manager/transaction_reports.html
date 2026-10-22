@@ -19,7 +19,10 @@
                 <i class="bi bi-search search-icon"></i>
                 <input type="text" class="search-input" placeholder="Search transactions...">
             </div>
-            <button type="button" class="btn-export-report">Export Report</button>
+            <div class="d-flex gap-2">
+                <button type="button" class="btn-export-report">Export CSV</button>
+                <button type="button" class="btn-export-report" id="print-report">Print / PDF</button>
+            </div>
         </div>
 
         <h4 class="fw-bold mb-3">Recent Transactions</h4>
@@ -57,5 +60,8 @@
 
     <script src="../assets/shared/bars.js"></script>
     <script src="transaction_reports.js"></script>
+    <script>
+        document.getElementById('print-report').addEventListener('click', () => window.print());
+    </script>
 </body>
 </html>

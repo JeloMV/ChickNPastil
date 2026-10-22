@@ -24,24 +24,13 @@
             </div>
 
             <!-- Transaction Cards List -->
-            <div class="transaction-list mb-4">
-                <div class="transaction-card">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <strong class="transaction-id">#0050 - John</strong>
-                        <button type="button" class="btn-details">Details</button>
-                    </div>
-                    <div class="text-muted small">12:59 PM - Dine-in</div>
-                    <div class="small fw-semibold text-secondary">1xPastil, 1xBottledWater</div>
-                    <div class="d-flex justify-content-between align-items-center mt-2">
-                        <span class="fw-bold">Php 50.00 - Cash</span>
-                        <span class="badge-status-completed">Completed</span>
-                    </div>
-                </div>
+            <div id="transaction-list" class="transaction-list mb-4">
+                <p>Loading transactions...</p>
             </div>
 
             <!-- Bottom Actions & Pagination -->
             <div class="d-flex flex-column align-items-center gap-3">
-                <button type="button" class="btn-export-report">Export Report</button>
+                <button type="button" class="btn-export-report" id="export-report">Export CSV</button>
                 <div class="pagination-controls d-flex align-items-center gap-2">
                     <button type="button" class="pagination-arrow" aria-label="Previous Page">&#9664;</button>
                     <span class="fw-bold">Page 1</span>
@@ -52,5 +41,6 @@
     </main>
 
     <script src="../assets/shared/bars.js"></script>
+    <script src="transaction_logs.js"></script>
 </body>
 </html>

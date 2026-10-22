@@ -16,10 +16,7 @@
 
     <main class="page-container">
         <div class="ordering-container">
-            <div class="menu">
-                <div class="ordering-item"></div>
-            </div>
-
+            <div class="menu"></div>
             <section class="order-summary">
                 <h3>Order Summary</h3>
                 <div class="summary-header">
@@ -41,8 +38,28 @@
                     <a href="../staff/transaction_logs.html">Today Sales Logs</a>
                 </div>
             </section>
+
+
         </div>
     </main>
+    
+    <div id="confirm-order-modal" class="order-modal">
+        <div class="order-modal-content">
+            <h4>Confirm Order</h4>
+
+            <p>Are you sure you want to proceed to payment?</p>
+
+            <div class="order-modal-actions">
+                <button type="button" id="cancel-confirm-order" class="btn-cancel">
+                    Cancel
+                </button>
+
+                <button type="button" id="proceed-to-payment" class="btn-proceed">
+                    Proceed to Payment
+                </button>
+            </div>
+        </div>
+    </div>
 
     <script src="../assets/shared/bars.js"></script>
     <script src="order.js"></script>

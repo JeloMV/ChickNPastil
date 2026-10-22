@@ -314,8 +314,30 @@ fetch('/api/menu')
         console.error(error);
     });
 
+renderOrderSummary();
 document.getElementById('complete-order').addEventListener('click', () => {
-    alert('Order summary is ready for checkout.');
+    if (selectedItems.size === 0) return;
+    sessionStorage.setItem('pendingOrder', JSON.stringify({
+        items: [...selectedItems.values()]
+    }));
+    window.location.href = 'checkout.html';
 });
 
-renderOrderSummary();
+document.getElementById('proceed-to-payment').addEventListener('click', async () => {
+    try {
+        const response = await fetch('/api/paymongo/create-checkout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount: 15000, referenceNumber: "POS-" + Date.now() }) // example ₱150.00
+        });
+
+        const data = await response.json();
+        if (data.checkout_url) {
+            window.location.href = data.checkout_url; // Redirects user to PayMongo GCash page
+        } else {
+            alert(data.error || 'Checkout failed');
+        }
+    } catch (err) {
+        console.error(err);
+    }
+});

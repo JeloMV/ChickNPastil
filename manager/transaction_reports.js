@@ -1,5 +1,6 @@
 const transactionBody = document.getElementById('transaction-table-body');
 const searchInput = document.querySelector('.search-input');
+const exportButton = document.querySelector('.btn-export-report');
 let transactions = [];
 
 function formatDate(value) {
@@ -53,11 +54,42 @@ function renderTransactions(records) {
     });
 }
 
+function exportCsv() {
+    const headers = ['Payment ID', 'Customer Name', 'Order Amount', 'Contact No.', 'Status', 'Notes', 'Date and Time'];
+    const rows = transactions.map(transaction => [
+        transaction.payment_id || '',
+        transaction.cust_name || 'Walk-in Customer',
+        Number(transaction.order_total || 0).toFixed(2),
+        transaction.contact_number || '',
+        transaction.order_status || '',
+        transaction.notes || '',
+        formatDate(transaction.order_datetime)
+    ]);
+    const csv = [headers, ...rows]
+        .map(row => row.map(value => `"${String(value).replace(/"/g, '""')}"`).join(','))
+        .join('\r\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `transactions-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+}
+
+if (exportButton) {
+    exportButton.addEventListener('click', () => {
+        if (transactions.length === 0) {
+            window.alert('There are no transactions to export.');
+            return;
+        }
+        exportCsv();
+    });
+}
+
 fetch('/api/transactions')
     .then(response => {
-        if (!response.ok) {
-            throw new Error(`Transactions request failed: ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`Transactions request failed: ${response.status}`);
         return response.json();
     })
     .then(data => {
