@@ -1,3 +1,7 @@
+-- This is a sample/reset script. Run the whole file in MySQL Workbench.
+-- It removes the existing sample database so all seed IDs are recreated
+-- consistently before dependent rows are inserted.
+DROP DATABASE IF EXISTS db123;
 CREATE DATABASE IF NOT EXISTS db123;
 USE db123;
 
@@ -94,3 +98,59 @@ CREATE TABLE receipts (
     FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
     FOREIGN KEY (payment_id) REFERENCES payments(payment_id)
 );
+
+-- ------------------------------------------------------------
+-- Sample seed data based on current staff/manager UI screens
+-- ------------------------------------------------------------
+
+INSERT INTO menu_section (section_name, is_available) VALUES
+('Pastil Size', TRUE),
+('Add-ons', TRUE),
+('Drinks', TRUE);
+
+INSERT INTO menu_products (section_id, product_name, description, price, is_available, image_url, allow_quantity) VALUES
+((SELECT section_id FROM menu_section WHERE section_name = 'Pastil Size' LIMIT 1), 'Small', 'Small pastil serving', 30.00, TRUE, 'assets/logo.png', TRUE),
+((SELECT section_id FROM menu_section WHERE section_name = 'Pastil Size' LIMIT 1), 'Medium', 'Medium pastil serving', 40.00, TRUE, 'assets/logo.png', TRUE),
+((SELECT section_id FROM menu_section WHERE section_name = 'Pastil Size' LIMIT 1), 'Large', 'Large pastil serving', 50.00, TRUE, 'assets/logo.png', TRUE),
+((SELECT section_id FROM menu_section WHERE section_name = 'Add-ons' LIMIT 1), 'Extra Rice', 'Additional rice topping', 10.00, TRUE, NULL, TRUE),
+((SELECT section_id FROM menu_section WHERE section_name = 'Add-ons' LIMIT 1), 'Egg', 'Boiled egg add-on', 15.00, TRUE, NULL, TRUE),
+((SELECT section_id FROM menu_section WHERE section_name = 'Drinks' LIMIT 1), 'Iced Tea', 'House blend iced tea', 20.00, TRUE, NULL, TRUE),
+((SELECT section_id FROM menu_section WHERE section_name = 'Drinks' LIMIT 1), 'Bottled Water', '500ml bottled water', 15.00, TRUE, NULL, TRUE);
+
+INSERT INTO product_addons (addon_name, addon_price, is_available) VALUES
+('Cheese', 12.00, TRUE),
+('Spicy Sauce', 5.00, TRUE),
+('Fried Garlic', 8.00, TRUE),
+('Seaweed Flakes', 10.00, FALSE);
+
+INSERT INTO orders (order_datetime, cust_name, contact_number, order_status, order_total, notes) VALUES
+('2026-10-20 09:10:00', 'Walk-in Customer', '09170000001', 'Completed', 112.00, 'Dine-in'),
+('2026-10-20 10:05:00', 'Maria Santos', '09170000002', 'Completed', 70.00, 'Takeout'),
+('2026-10-21 11:25:00', 'John Cruz', '09170000003', 'Preparing', 53.00, 'No onions'),
+('2026-10-21 12:45:00', 'Liza Reyes', '09170000004', 'Pending', 50.00, 'Waiting for GCash confirmation'),
+('2026-10-22 08:20:00', 'Mark Dela Pena', '09170000005', 'Cancelled', 40.00, 'Customer cancelled before prep');
+
+INSERT INTO order_items (order_id, product_id, item_name, unit_price, quantity, subtotal) VALUES
+(1, (SELECT product_id FROM menu_products WHERE product_name = 'Medium' LIMIT 1), 'Medium', 40.00, 2, 80.00),
+(1, (SELECT product_id FROM menu_products WHERE product_name = 'Iced Tea' LIMIT 1), 'Iced Tea', 20.00, 1, 20.00),
+(2, (SELECT product_id FROM menu_products WHERE product_name = 'Small' LIMIT 1), 'Small', 30.00, 2, 60.00),
+(3, (SELECT product_id FROM menu_products WHERE product_name = 'Small' LIMIT 1), 'Small', 30.00, 1, 30.00),
+(3, (SELECT product_id FROM menu_products WHERE product_name = 'Egg' LIMIT 1), 'Egg', 15.00, 1, 15.00),
+(4, (SELECT product_id FROM menu_products WHERE product_name = 'Large' LIMIT 1), 'Large', 50.00, 1, 50.00),
+(5, (SELECT product_id FROM menu_products WHERE product_name = 'Medium' LIMIT 1), 'Medium', 40.00, 1, 40.00);
+
+INSERT INTO order_item_addons (order_item_id, addon_id, addon_name, addon_price, quantity, subtotal) VALUES
+(1, (SELECT addon_id FROM product_addons WHERE addon_name = 'Cheese' LIMIT 1), 'Cheese', 12.00, 1, 12.00),
+(3, (SELECT addon_id FROM product_addons WHERE addon_name = 'Spicy Sauce' LIMIT 1), 'Spicy Sauce', 5.00, 2, 10.00),
+(4, (SELECT addon_id FROM product_addons WHERE addon_name = 'Fried Garlic' LIMIT 1), 'Fried Garlic', 8.00, 1, 8.00);
+
+INSERT INTO payments (order_id, payment_method, amount_due, amount_paid, change_amount, gcash_reference_number, payment_status, paid_at) VALUES
+(1, 'Cash', 112.00, 200.00, 88.00, NULL, 'Verified', '2026-10-20 09:12:00'),
+(2, 'Cash', 70.00, 100.00, 30.00, NULL, 'Verified', '2026-10-20 10:08:00'),
+(3, 'GCash', 53.00, 53.00, 0.00, 'GCX-20261021-001', 'Pending', NULL),
+(4, 'GCash', 50.00, 50.00, 0.00, 'GCX-20261021-002', 'Pending', NULL),
+(5, 'Cash', 40.00, 0.00, 0.00, NULL, 'Failed', NULL);
+
+INSERT INTO receipts (order_id, payment_id, transaction_number, receipt_type, issued_at) VALUES
+(1, 1, 'TXN-20261020-0001', 'Printed', '2026-10-20 09:13:00'),
+(2, 2, 'TXN-20261020-0002', 'Digital', '2026-10-20 10:09:00');

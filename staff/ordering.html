@@ -6,13 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ordering</title>
     <link rel="stylesheet" href="../assets/styles.css">
-    <style>
-        .ordering-item img {
-            width: 120px;
-            height: 150px;
-            object-fit: contain;
-        }
-    </style>
 </head>
 
 <body>
@@ -21,26 +14,124 @@
         <div class="ordering-item"></div>
     </div>
 
+    <section class="order-summary">
+        <h3>Order Summary</h3>
+        <div class="summary-header">
+            <strong>Item</strong>
+            <strong>Qty</strong>
+        </div>
+        <div id="summary-items">
+            <p class="empty-summary">No items selected.</p>
+        </div>
+        <div class="summary-total">
+            <strong>Total Amount:</strong>
+            <strong id="summary-total-amount">Php 0.00</strong>
+        </div>
+        <button type="button" id="complete-order" class="complete-order" disabled>
+            Complete Order
+        </button>
+        <div class="attached-logs">
+            <strong>Attached:</strong>
+            <a href="transaction_logs.html">Today's Sales Logs</a>
+        </div>
+    </section>
+
     <script src="../assets/header.js"></script>
     <script>
+        const selectedItems = new Map();
+
+        function renderOrderSummary() {
+            const summaryItems = document.getElementById('summary-items');
+            const totalElement = document.getElementById('summary-total-amount');
+            const completeButton = document.getElementById('complete-order');
+            summaryItems.replaceChildren();
+
+            let total = 0;
+            selectedItems.forEach(item => {
+                const subtotal = item.price * item.quantity;
+                total += subtotal;
+
+                const row = document.createElement('div');
+                row.className = 'summary-item';
+                row.innerHTML = `
+                    <button type="button" class="remove-item" aria-label="Remove ${item.name}">×</button>
+                    <strong>${item.name}</strong>
+                    <input type="number" min="1" value="${item.quantity}" class="summary-quantity">
+                `;
+
+                row.querySelector('.remove-item').addEventListener('click', () => {
+                    selectedItems.delete(item.id);
+                    updateMenuQuantity(item.id, 0);
+                    renderOrderSummary();
+                });
+
+                row.querySelector('.summary-quantity').addEventListener('change', event => {
+                    item.quantity = Math.max(1, Number(event.target.value) || 1);
+                    updateMenuQuantity(item.id, item.quantity);
+                    renderOrderSummary();
+                });
+
+                summaryItems.appendChild(row);
+            });
+
+            if (selectedItems.size === 0) {
+                summaryItems.innerHTML = '<p class="empty-summary">No items selected.</p>';
+            }
+
+            totalElement.textContent = `Php ${total.toFixed(2)}`;
+            completeButton.disabled = selectedItems.size === 0;
+        }
+
+        function updateMenuQuantity(productId, quantity) {
+            const card = document.querySelector(`[data-product-id="${productId}"]`);
+            if (card) {
+                const quantityInput = card.querySelector('.qty-input');
+                if (quantityInput) {
+                    quantityInput.value = quantity;
+                }
+            }
+        }
+
+        function addItem(item, quantity = 1) {
+            const id = item.product_id || item.id;
+            const existing = selectedItems.get(id);
+            selectedItems.set(id, {
+                id,
+                name: item.name,
+                price: Number(item.price) || 0,
+                quantity: existing ? existing.quantity + quantity : quantity
+            });
+            updateMenuQuantity(id, selectedItems.get(id).quantity);
+            renderOrderSummary();
+        }
+
         function renderMenu(sections) {
             const page = document.querySelector('.menu');
             page.replaceChildren();
 
             sections.forEach(section => {
+                const sectionBlock = document.createElement('section');
+                sectionBlock.className = 'menu-section';
+
                 const title = document.createElement('h3');
+                title.className = 'menu-section-title';
                 title.textContent = section.name;
-                page.appendChild(title);
+                sectionBlock.appendChild(title);
+
+                const items = document.createElement('div');
+                items.className = 'menu-section-items';
+                sectionBlock.appendChild(items);
 
                 (section.items || []).forEach(item => {
                     const card = document.createElement('div');
                     card.className = 'ordering-item';
+                    card.dataset.productId = item.product_id || item.id;
 
                     // Check if quantity selector is enabled or disabled from the manager settings
                     const actionButton = item.allow_quantity
                         ? `
                         <div class="qty-selector">
-                            <input type="number" value="1" min="1" class="qty-input">
+                            <input type="number" value="0" min="0" class="qty-input">
                         </div>
                         `
                         : `
@@ -60,8 +151,35 @@
                         ${actionButton}
                     `;
 
-                    page.appendChild(card);
+                    card.addEventListener('click', event => {
+                        if (event.target.closest('.qty-selector')) {
+                            return;
+                        }
+
+                        addItem(item);
+                    });
+
+                    if (item.allow_quantity) {
+                        card.querySelector('.qty-input').addEventListener('change', event => {
+                            const quantity = Math.max(0, Number(event.target.value) || 0);
+                            if (quantity === 0) {
+                                selectedItems.delete(item.product_id || item.id);
+                            } else {
+                                selectedItems.set(item.product_id || item.id, {
+                                    id: item.product_id || item.id,
+                                    name: item.name,
+                                    price: Number(item.price) || 0,
+                                    quantity
+                                });
+                            }
+                            renderOrderSummary();
+                        });
+                    }
+
+                    items.appendChild(card);
                 });
+
+                page.appendChild(sectionBlock);
             });
         }
 
@@ -78,6 +196,12 @@
                     `Unable to load menu. ${error.message}`;
                 console.error(error);
             });
+
+        document.getElementById('complete-order').addEventListener('click', () => {
+            alert('Order summary is ready for checkout.');
+        });
+
+        renderOrderSummary();
     </script>
 </body>
 

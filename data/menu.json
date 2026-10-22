@@ -13,6 +13,24 @@
           "allow_quantity": true,
           "sort_order": 1,
           "is_active": true
+        },
+        {
+          "id": 2,
+          "name": "Medium",
+          "image": "assets/logo.png",
+          "price": 40,
+          "allow_quantity": true,
+          "sort_order": 2,
+          "is_active": true
+        },
+        {
+          "id": 3,
+          "name": "Large",
+          "image": "assets/logo.png",
+          "price": 50,
+          "allow_quantity": true,
+          "sort_order": 3,
+          "is_active": true
         }
       ]
     }

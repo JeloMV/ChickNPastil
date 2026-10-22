@@ -8,13 +8,10 @@ const app = express()
 const PORT = 3000;
 
 app.use(express.static(path.resolve(__dirname)));
-
-app.get("/api/menu", (req, res) => {
-    res.sendFile(path.resolve(__dirname, "data", "menu.json"));
-});
+app.use(express.json());
 
 app.get("/", (req, res) => {
-    const role = "manager";
+    const role = "staff";
 
     if(role === "staff"){
         return res.redirect("/staff/dashboard.html");
@@ -35,7 +32,8 @@ app.listen(PORT, () => {
 app.get('/api/menu', (req, res) => {
     const query = `
         SELECT s.section_id, s.section_name, 
-               p.product_id, p.product_name, p.price, p.is_available
+               p.product_id, p.product_name, p.description, p.price,
+               p.is_available, p.image_url, p.allow_quantity
         FROM menu_section s
         LEFT JOIN menu_products p ON s.section_id = p.section_id
         WHERE s.is_available = TRUE AND (p.is_available = TRUE OR p.is_available IS NULL)
@@ -57,15 +55,57 @@ app.get('/api/menu', (req, res) => {
             }
             if (row.product_id) {
                 sectionsMap[row.section_id].items.push({
-                    id: row.product_id,
+                    product_id: row.product_id,
                     name: row.product_name,
-                    price: row.price
+                    description: row.description,
+                    price: row.price,
+                    is_available: row.is_available,
+                    image_url: row.image_url,
+                    allow_quantity: row.allow_quantity
                 });
             }
         });
 
-        res.json(Object.values(sectionsMap));
+        res.json(Object.values(sectionsMap).map(section => ({
+            section_id: section.id,
+            name: section.name,
+            items: section.items
+        })));
     });
+});
+
+app.post('/api/sections', (req, res) => {
+    const { section_name } = req.body;
+    if (!section_name || !section_name.trim()) {
+        return res.status(400).json({ error: 'Section name is required' });
+    }
+
+    db.query(
+        'INSERT INTO menu_section (section_name) VALUES (?)',
+        [section_name.trim()],
+        (err, result) => {
+            if (err) return res.status(500).json({ error: err.message });
+            res.status(201).json({ section_id: result.insertId });
+        }
+    );
+});
+
+app.post('/api/products', (req, res) => {
+    const { section_id, product_name, price, allow_quantity, image_url } = req.body;
+    if (!section_id || !product_name || !product_name.trim()) {
+        return res.status(400).json({ error: 'Section and product name are required' });
+    }
+
+    db.query(
+        `INSERT INTO menu_products
+            (section_id, product_name, price, allow_quantity, image_url)
+         VALUES (?, ?, ?, ?, ?)`,
+        [section_id, product_name.trim(), Number(price) || 0, allow_quantity !== false, image_url || null],
+        (err, result) => {
+            if (err) return res.status(500).json({ error: err.message });
+            res.status(201).json({ product_id: result.insertId });
+        }
+    );
 });
 
 // 1. Update product details (Modify)
